@@ -8,10 +8,9 @@ import NotesList from "@/components/NoteList/NoteList";
 import { fetchNotes, type FetchNotesResponse } from "@/lib/api";
 import type { Note, NoteTag } from '@/types/note';
 import SearchBox from "@/components/SearchBox/SearchBox";
-import Modal from "@/components/CreateNoteModal/CreateNoteModal";
 import Pagination from "@/components/Pagination/Pagination";
-import NoteForm from "@/components/NoteForm/NoteForm";
 import toast, { Toaster } from "react-hot-toast";
+import Link from "next/link";
 
 interface NotesProps {
   initialData: FetchNotesResponse;
@@ -58,10 +57,6 @@ export default function Notes({ initialData, tag: initialTag }: NotesProps) {
     placeholderData: (previousData) => previousData ?? initialData,
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
   const notes: Note[] = data?.notes ?? [];
   const totalPages: number = data?.totalPages ?? 1;
 
@@ -82,19 +77,14 @@ export default function Notes({ initialData, tag: initialTag }: NotesProps) {
             onPageChange={setPage}
           />
         )}
-        <button className={css.button} onClick={openModal}>
+        <Link href="/notes/action/create" className={css.button}>
           Create note +
-        </button>
+        </Link>
       </header>
       <Toaster position="top-center" />
       {isLoading && <p>Loading...</p>}
       {isError && <p>Error...</p>}
       {notes.length > 0 && <NotesList notes={notes} />}
-      {isModalOpen && (
-        <Modal onClose={closeModal}>
-          <NoteForm onCloseModal={closeModal} />
-        </Modal>
-      )}
     </div>
   );
 }

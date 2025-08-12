@@ -3,6 +3,7 @@ import { fetchNotes } from '@/lib/api';
 import NotesClient from "./Notes.client";
 import { notFound } from 'next/navigation';
 import type { NoteTag } from '@/types/note';
+import type { Metadata } from 'next';
 
 interface NotesPageProps {
   params: Promise<{ slug: string[] }>;
@@ -13,6 +14,18 @@ const isNoteTag = (tag: string): tag is NoteTag => {
 };
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+export async function generateMetadata(
+  { params }: NotesPageProps
+): Promise<Metadata> {
+  const { slug } = await params;
+  const raw = slug?.[0] ?? 'All';
+  const normalized = capitalize(raw);
+  return {
+    title: `${normalized} notes — NoteHub`,
+    description: `Browse ${normalized} notes in NoteHub.`,
+  };
+}
 
 export default async function NotesPage({ params }: NotesPageProps) {
   const { slug } = await params;
