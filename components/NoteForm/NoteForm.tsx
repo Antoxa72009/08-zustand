@@ -9,7 +9,11 @@ import { useNoteStore } from '@/lib/store/noteStore';
 import { useRouter } from 'next/navigation';
 import { FormEvent } from 'react';
 
-export default function NoteForm() {
+interface NoteFormProps {
+  onCloseModal?: () => void;
+}
+
+export default function NoteForm({ onCloseModal }: NoteFormProps) {
   const fieldId = useId();
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -21,7 +25,11 @@ export default function NoteForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notes'] });
       clearDraft();
-      router.back();
+      if (onCloseModal) {
+        onCloseModal();
+      } else {
+        router.back();
+      }
     },
   });
 
@@ -35,6 +43,14 @@ export default function NoteForm() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     mutate(draft);
+  };
+
+  const handleCancel = () => {
+    if (onCloseModal) {
+      onCloseModal();
+    } else {
+      router.back();
+    }
   };
 
   return (
@@ -88,7 +104,7 @@ export default function NoteForm() {
         <button type="submit" className={css.submit} disabled={isPending}>
           {isPending ? 'Saving...' : 'Save'}
         </button>
-        <button type="button" className={css.cancel} onClick={() => router.back()}>
+        <button type="button" className={css.cancel} onClick={handleCancel}>
           Cancel
         </button>
       </div>
